@@ -57,10 +57,12 @@ def scheduled_revert_job():
         db.close()
 
 from app.auth.jwt import hash_password
+from app.db.models import Restaurant, Shelter
 
-def seed_admin_user():
+def seed_initial_data():
     db = SessionLocal()
     try:
+        # Seed Admin
         admin_user = db.query(User).filter(User.email == "admin@foodbridge.com").first()
         if not admin_user:
             admin_user = User(
@@ -70,16 +72,61 @@ def seed_admin_user():
             )
             db.add(admin_user)
             db.commit()
-            logger.info("Default admin user (admin@foodbridge.com) created successfully.")
+            logger.info("Default admin user (admin@foodbridge.com) created.")
+
+        # Seed Demo Restaurant
+        rest_user = db.query(User).filter(User.email == "ANVESHASHUKLA8@gmail.com").first()
+        if not rest_user:
+            rest_user = User(
+                email="ANVESHASHUKLA8@gmail.com",
+                password_hash=hash_password("password123"),
+                user_type="RESTAURANT"
+            )
+            db.add(rest_user)
+            db.flush()
+            rest = Restaurant(
+                user_id=rest_user.user_id,
+                restaurant_name="AapKiKashish",
+                address="Civil Lines",
+                city="Kanpur",
+                phone_number="9876543210"
+            )
+            db.add(rest)
+            db.commit()
+            logger.info("Demo restaurant (ANVESHASHUKLA8@gmail.com) seeded.")
+
+        # Seed Demo Shelter
+        shelter_user = db.query(User).filter(User.email == "kushukla1102@gmail.com").first()
+        if not shelter_user:
+            shelter_user = User(
+                email="kushukla1102@gmail.com",
+                password_hash=hash_password("password123"),
+                user_type="SHELTER"
+            )
+            db.add(shelter_user)
+            db.flush()
+            sh = Shelter(
+                user_id=shelter_user.user_id,
+                shelter_name="Kashish Shelter house",
+                shelter_type="SHELTER",
+                address="Swaroop Nagar",
+                city="Kanpur",
+                beneficiaries_count=50,
+                phone_number="9876543211"
+            )
+            db.add(sh)
+            db.commit()
+            logger.info("Demo shelter (kushukla1102@gmail.com) seeded.")
+
     except Exception as e:
         db.rollback()
-        logger.warning(f"Admin seeding check warning: {str(e)}")
+        logger.warning(f"Initial data seeding warning: {str(e)}")
     finally:
         db.close()
 
 @app.on_event("startup")
 def startup_event():
-    seed_admin_user()
+    seed_initial_data()
     scheduler.add_job(scheduled_revert_job, "interval", minutes=5)
     scheduler.start()
     logger.info("FoodBridge FastAPI service started & APScheduler initialized.")
