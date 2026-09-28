@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+**/node_modules/
+**/__pycache__/
+*.pyc
+
+# Environment & secret files
+.env
+backend/.env
+
+# Local databases
+backend/*.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Build outputs
+dist/
+**/dist/
+build/
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
