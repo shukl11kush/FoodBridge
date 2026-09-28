@@ -135,6 +135,8 @@ app.include_router(chat.router)
 app.include_router(rewards.router)
 app.include_router(admin.router)
 
+@app.get("/", tags=["Health"])
+@app.get("/health", tags=["Health"])
 @app.get("/api/v1/health", tags=["Health"])
 def health_check():
     return {
